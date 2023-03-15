@@ -1,0 +1,13 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "frontend": {
+      "appLocation": "frontend",
+      "outputLocation": "build",
+      "appBuildCommand": "dotnet build",
+      "run": "dotnet watch",
+      "appDevserverUrl": "http://localhost:5116",
+      "dataApiLocation": "data"
+    }
+  }
+}

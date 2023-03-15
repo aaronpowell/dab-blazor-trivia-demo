@@ -1,0 +1,191 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+}
+
+enum OrderBy {
+  ASC
+  DESC
+}
+
+input DefaultValue {
+  Byte: Byte
+  Short: Short
+  Int: Int
+  Long: Long
+  String: String
+  Boolean: Boolean
+  Single: Single
+  Float: Float
+  Decimal: Decimal
+  DateTime: DateTime
+  ByteArray: ByteArray
+}
+
+type Question {
+  id: Int!
+  question: String!
+  correct_answer: String!
+  incorrect_answers: String!
+}
+
+"Order by input for Question GraphQL type"
+input QuestionOrderByInput {
+  "Order by options for id"
+  id: OrderBy
+  "Order by options for question"
+  question: OrderBy
+  "Order by options for correct_answer"
+  correct_answer: OrderBy
+  "Order by options for incorrect_answers"
+  incorrect_answers: OrderBy
+  "Conditions to be treated as AND operations"
+  and: [QuestionOrderByInput]
+  "Conditions to be treated as OR operations"
+  or: [QuestionOrderByInput]
+}
+
+"Input type for adding Int filters"
+input IntFilterInput {
+  "Equals"
+  eq: Int
+  "Greater Than"
+  gt: Int
+  "Greater Than or Equal To"
+  gte: Int
+  "Less Than"
+  lt: Int
+  "Less Than or Equal To"
+  lte: Int
+  "Not Equals"
+  neq: Int
+  "Not null test"
+  isNull: Boolean
+}
+
+"Input type for adding String filters"
+input StringFilterInput {
+  "Equals"
+  eq: String
+  "Contains"
+  contains: String
+  "Not Contains"
+  notContains: String
+  "Starts With"
+  startsWith: String
+  "Ends With"
+  endsWith: String
+  "Not Equals"
+  neq: String
+  "Case Insensitive"
+  caseInsensitive: Boolean = false
+  "Not null test"
+  isNull: Boolean
+}
+
+"Filter input for Question GraphQL type"
+input QuestionFilterInput {
+  "Filter options for id"
+  id: IntFilterInput
+  "Filter options for question"
+  question: StringFilterInput
+  "Filter options for correct_answer"
+  correct_answer: StringFilterInput
+  "Filter options for incorrect_answers"
+  incorrect_answers: StringFilterInput
+  "Conditions to be treated as AND operations"
+  and: [QuestionFilterInput]
+  "Conditions to be treated as OR operations"
+  or: [QuestionFilterInput]
+}
+
+type Query {
+  "Get a list of all the Question items from the database"
+  questions("The number of items to return from the page start point" first: Int "A pagination token from a previous query to continue through a paginated list" after: String "Filter options for query" filter: QuestionFilterInput "Ordering options for query" orderBy: QuestionOrderByInput): QuestionConnection!
+  "Get a Question from the database by its ID\/primary key"
+  question_by_pk(id: Int!): Question
+}
+
+"The return object from a filter query that supports a pagination token for paging through results"
+type QuestionConnection {
+  "The list of items that matched the filter"
+  items: [Question!]!
+  "A pagination token to provide to subsequent pages of a query"
+  endCursor: String
+  "Indicates if there are more pages of items to return"
+  hasNextPage: Boolean!
+}
+
+type Mutation {
+  "Creates a new Question"
+  createQuestion("Input representing all the fields for creating Question" item: CreateQuestionInput!): Question
+  "Updates a Question"
+  updateQuestion("The ID of the item being updated." id: Int! "Input representing all the fields for updating Question" item: UpdateQuestionInput!): Question
+  "Delete a Question"
+  deleteQuestion("The ID of the item being deleted." id: Int!): Question
+}
+
+"Input type for creating Question"
+input CreateQuestionInput {
+  "Input for field question on type CreateQuestionInput"
+  question: String!
+  "Input for field correct_answer on type CreateQuestionInput"
+  correct_answer: String!
+  "Input for field incorrect_answers on type CreateQuestionInput"
+  incorrect_answers: String!
+}
+
+"Input type for updating Question"
+input UpdateQuestionInput {
+  "Input for field question on type UpdateQuestionInput"
+  question: String
+  "Input for field correct_answer on type UpdateQuestionInput"
+  correct_answer: String
+  "Input for field incorrect_answers on type UpdateQuestionInput"
+  incorrect_answers: String
+}
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+}
+
+"The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
+scalar Byte
+
+"The `Short` scalar type represents non-fractional signed whole 16-bit numeric values. Short can represent values between -(2^15) and 2^15 - 1."
+scalar Short
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+"IEEE 754 32 bit float"
+scalar Single
+
+"The built-in `Decimal` scalar type."
+scalar Decimal
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime
+
+scalar ByteArray
+
+"The `@oneOf` directive is used within the type system definition language\n to indicate:\n\n - an Input Object is a Oneof Input Object, or\n - an Object Type's Field is a Oneof Field."
+directive @oneOf on INPUT_OBJECT
+
+directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!] "Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION
+
+"A directive to indicate the type maps to a storable entity not a nested entity."
+directive @model("Underlying name of the database entity." name: String) on OBJECT
+
+"A directive to indicate the relationship between two tables"
+directive @relationship("The name of the entity the relationship targets" target: String "The relationship cardinality" cardinality: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+"A directive to indicate the primary key field of an item."
+directive @primaryKey("The underlying database type." databaseType: String) on FIELD_DEFINITION
+
+"The default value to be used when creating an item."
+directive @defaultValue(value: DefaultValue) on FIELD_DEFINITION
+
+"Indicates that a field is auto generated by the database."
+directive @autoGenerated on FIELD_DEFINITION

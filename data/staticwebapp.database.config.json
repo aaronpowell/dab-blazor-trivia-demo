@@ -1,0 +1,30 @@
+{
+  "$schema": "https://dataapibuilder.azureedge.net/schemas/v0.5.0-beta/dab.draft.schema.json",
+  "data-source": {
+    "connection-string": "Server=sql,1433;Database=trivia;User Id=sa;Password=YourStrongPassword!;Persist Security Info=False;MultipleActiveResultSets=False;Connection Timeout=5;TrustServerCertificate=true;",
+    "database-type": "mssql"
+  },
+  "runtime": {
+    "host": {
+      "mode": "development",
+      "cors": {
+        "origins": ["http://localhost:4280"],
+        "allow-credentials": true
+      },
+      "authentication": {
+        "provider": "StaticWebApps"
+      }
+    }
+  },
+  "entities": {
+    "Question": {
+      "source": "dbo.question",
+      "permissions": [
+        {
+          "actions": ["*"],
+          "role": "anonymous"
+        }
+      ]
+    }
+  }
+}

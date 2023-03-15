@@ -1,0 +1,10 @@
+query getQuestions {
+  questions(first: 10) {
+    items {
+      id
+      question
+      correct_answer
+      incorrect_answers
+    }
+  }
+}

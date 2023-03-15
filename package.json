@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "start": "swa start",
+    "setup": "ts-node .azure/index.ts"
+  },
+  "devDependencies": {
+    "@azure/static-web-apps-cli": "^1.1.0",
+    "@types/mssql": "^8.1.2",
+    "@types/node": "^18.13.0",
+    "dotenv": "^16.0.3",
+    "mssql": "^9.1.1",
+    "ts-node": "^10.9.1"
+  }
+}

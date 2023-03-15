@@ -1,0 +1,76 @@
+﻿@page "/"
+@inject TriviaClient TriviaClient;
+@using System.Text.Json;
+
+<PageTitle>Index</PageTitle>
+
+@if (questions.Any())
+{
+    <h1>Trivia time</h1>
+
+    @foreach(var question in questions) {
+        <section>
+            <h2>@((MarkupString)question.Question)</h2>
+            <ul>
+                @foreach(var answer in question.Answers) {
+                    <li>
+                        <label>
+                            <input type="radio" name="@question.Id" value="@answer" @onchange="(() => playerAnswers[question.Id] = answer)" />
+                            @((MarkupString)answer)
+                        </label>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
+    <div>
+        <button disabled="@(playerAnswers.Count() != questions.Count())" @onclick="CheckAnswers">Check answers</button>
+    </div>
+
+    @if (message != string.Empty) {
+        <div>
+            <p>@message</p>
+        </div>
+    }
+}
+
+@code {
+    record QuestionModel(int Id, string Question, IEnumerable<string> Answers, string CorrectAnswer);
+
+    private IEnumerable<QuestionModel> questions = new List<QuestionModel>();
+    private Dictionary<int, string> playerAnswers = new();
+    private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await TriviaClient.GetQuestions.ExecuteAsync();
+
+        if (result is null || result.Data is null) {
+            return;
+        }
+
+        questions = result.Data.Questions.Items.Select(q => {
+            var incorrectAnswers = JsonSerializer.Deserialize<List<string>>(q.Incorrect_answers);
+            return new QuestionModel(q.Id, q.Question, Randomise(incorrectAnswers.Append(q.Correct_answer)), q.Correct_answer);
+        }).ToList();
+    }
+
+    public static IEnumerable<string> Randomise(IEnumerable<string> list)
+    {
+        var random = new Random();
+        return list.OrderBy(x => random.Next()).ToList();
+    }
+
+    public void CheckAnswers() {
+        var correctCount = 0;
+        foreach ((int questionId, string answer) in playerAnswers) {
+            var question = questions.First(q => q.Id == questionId);
+            if (question.CorrectAnswer == answer) {
+                correctCount++;
+            }
+        }
+
+        message = $"You got {correctCount} of {questions.Count()} correct!";
+    }
+}
